@@ -5,118 +5,197 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Advanced Image to ASCII Art Editor</title>
   <style>
+    /* CSS Variables for easy theming */
+    :root {
+      --main-bg: #f5f5f5;
+      --control-bg: #fff;
+      --control-shadow: rgba(0, 0, 0, 0.15);
+      --accent-color: #3a86ff;
+      --text-color: #333;
+      --ascii-bg: #000;
+      --ascii-text: #fff;
+    }
+
+    /* Global Reset & Box Sizing */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Body & Container Styling */
     body {
       font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      background: #f2f2f2;
-      color: #333;
+      background: var(--main-bg);
+      color: var(--text-color);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 1rem;
+      min-height: 100vh;
     }
+    .container {
+      width: 100%;
+      max-width: 600px;
+      background: #fff;
+      border-radius: 10px;
+      padding: 1.5rem;
+      box-shadow: 0 4px 12px var(--control-shadow);
+    }
+
+    /* Headings */
     h1, h2 {
       text-align: center;
-      margin-bottom: 10px;
+      margin-bottom: 1rem;
     }
+
+    /* File Input */
     #upload {
       display: block;
-      margin: 20px auto;
+      margin: 1rem auto 1.5rem auto;
+      font-size: 1rem;
+      padding: 0.5rem;
     }
+
+    /* Controls Box */
     #controls {
-      max-width: 480px;
-      margin: 20px auto;
-      padding: 15px;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      background: var(--control-bg);
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 2px 8px var(--control-shadow);
     }
+
     .slider {
-      margin: 12px 0;
       display: flex;
       align-items: center;
+      margin: 0.75rem 0;
     }
+
     .slider label {
       flex: 1;
-      margin-right: 10px;
-      font-size: 0.9em;
+      margin-right: 0.5rem;
+      font-size: 0.9rem;
     }
-    .slider input[type=range] {
+
+    .slider input[type="range"] {
       flex: 2;
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 5px;
+      background: #ddd;
+      outline: none;
+      transition: background 0.3s ease;
     }
+
+    /* Custom Range Thumb Styling */
+    .slider input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent-color);
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .slider input[type="range"]::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: var(--accent-color);
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    /* ASCII Art Output Box */
     #asciiArt {
-      max-width: 90%;
-      margin: 20px auto;
-      padding: 10px;
-      background: #000;
-      color: #fff;
-      font-family: monospace;
-      white-space: pre;
+      width: 100%;
+      height: 300px;          /* Fixed height for scrollable output */
+      overflow-y: auto;
       overflow-x: auto;
-      border-radius: 4px;
+      padding: 1rem;
+      background: var(--ascii-bg);
+      color: var(--ascii-text);
+      font-family: 'Courier New', Courier, monospace;
+      white-space: pre;
+      border-radius: 8px;
       box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+      margin-bottom: 1rem;
     }
+
+    /* Responsive Adjustments */
     @media (max-width: 600px) {
-      #controls {
-        width: 90%;
+      .container {
+        padding: 1rem;
+      }
+      #asciiArt {
+        height: 250px;
       }
     }
   </style>
 </head>
 <body>
-  <h1>Advanced Image to ASCII Art Editor</h1>
-  <input type="file" id="upload" accept="image/*" />
+  <div class="container">
+    <h1>Advanced Image to ASCII Art Editor</h1>
+    <input type="file" id="upload" accept="image/*" />
 
-  <!-- Hidden canvas for image processing -->
-  <canvas id="imageCanvas" style="display:none;"></canvas>
+    <!-- Hidden canvas for image processing -->
+    <canvas id="imageCanvas" style="display:none;"></canvas>
 
-  <div id="controls">
-    <!-- Exposure: slider from -5 to 5 stops -->
-    <div class="slider">
-      <label for="exposure">Exposure</label>
-      <input type="range" id="exposure" min="-5" max="5" step="0.1" value="0" />
+    <div id="controls">
+      <!-- Exposure: slider from -5 to 5 stops -->
+      <div class="slider">
+        <label for="exposure">Exposure</label>
+        <input type="range" id="exposure" min="-5" max="5" step="0.1" value="0" />
+      </div>
+      <!-- Brightness: slider from -100 to 100 -->
+      <div class="slider">
+        <label for="brightness">Brightness</label>
+        <input type="range" id="brightness" min="-100" max="100" value="0" />
+      </div>
+      <!-- Contrast: slider from -100 to 100 -->
+      <div class="slider">
+        <label for="contrast">Contrast</label>
+        <input type="range" id="contrast" min="-100" max="100" value="0" />
+      </div>
+      <!-- Saturation: slider from 0% to 200% (100 = normal) -->
+      <div class="slider">
+        <label for="saturation">Saturation</label>
+        <input type="range" id="saturation" min="0" max="200" value="100" />
+      </div>
+      <!-- Blacks: slider to adjust lower level remapping (0 to 100) -->
+      <div class="slider">
+        <label for="blacks">Blacks</label>
+        <input type="range" id="blacks" min="0" max="100" value="0" />
+      </div>
+      <!-- Whites: slider to adjust upper level remapping (155 to 255) -->
+      <div class="slider">
+        <label for="whites">Whites</label>
+        <input type="range" id="whites" min="155" max="255" value="255" />
+      </div>
+      <!-- Sharpness: slider from 0 (off) to 5 (strong) -->
+      <div class="slider">
+        <label for="sharpness">Sharpness</label>
+        <input type="range" id="sharpness" min="0" max="5" step="0.1" value="0" />
+      </div>
+      <!-- Clarity: slider from 0 (off) to 5 (strong) -->
+      <div class="slider">
+        <label for="clarity">Clarity</label>
+        <input type="range" id="clarity" min="0" max="5" step="0.1" value="0" />
+      </div>
+      <!-- Pixelize: controls the block size for ASCII conversion -->
+      <div class="slider">
+        <label for="pixelize">Pixelize</label>
+        <input type="range" id="pixelize" min="1" max="20" value="1" />
+      </div>
     </div>
-    <!-- Brightness: slider from -100 to 100 -->
-    <div class="slider">
-      <label for="brightness">Brightness</label>
-      <input type="range" id="brightness" min="-100" max="100" value="0" />
-    </div>
-    <!-- Contrast: slider from -100 to 100 -->
-    <div class="slider">
-      <label for="contrast">Contrast</label>
-      <input type="range" id="contrast" min="-100" max="100" value="0" />
-    </div>
-    <!-- Saturation: slider from 0% to 200% (100 = normal) -->
-    <div class="slider">
-      <label for="saturation">Saturation</label>
-      <input type="range" id="saturation" min="0" max="200" value="100" />
-    </div>
-    <!-- Blacks: slider to adjust lower level remapping (0 to 100) -->
-    <div class="slider">
-      <label for="blacks">Blacks</label>
-      <input type="range" id="blacks" min="0" max="100" value="0" />
-    </div>
-    <!-- Whites: slider to adjust upper level remapping (155 to 255) -->
-    <div class="slider">
-      <label for="whites">Whites</label>
-      <input type="range" id="whites" min="155" max="255" value="255" />
-    </div>
-    <!-- Sharpness: slider from 0 (off) to 5 (strong) -->
-    <div class="slider">
-      <label for="sharpness">Sharpness</label>
-      <input type="range" id="sharpness" min="0" max="5" step="0.1" value="0" />
-    </div>
-    <!-- Clarity: slider from 0 (off) to 5 (strong) -->
-    <div class="slider">
-      <label for="clarity">Clarity</label>
-      <input type="range" id="clarity" min="0" max="5" step="0.1" value="0" />
-    </div>
-    <!-- Pixelize: controls the block size for ASCII conversion -->
-    <div class="slider">
-      <label for="pixelize">Pixelize</label>
-      <input type="range" id="pixelize" min="1" max="20" value="1" />
-    </div>
+
+    <h2>ASCII Art Output</h2>
+    <pre id="asciiArt"></pre>
   </div>
-
-  <h2>ASCII Art Output</h2>
-  <pre id="asciiArt"></pre>
 
   <script>
     // Get DOM elements and canvas context.
@@ -175,7 +254,7 @@
       // Retrieve current slider values.
       const exposure   = parseFloat(exposureSlider.value); // in stops
       const brightness = parseInt(brightnessSlider.value, 10); // additive
-      const contrast   = parseInt(contrastSlider.value, 10);   // in percentage offset
+      const contrast   = parseInt(contrastSlider.value, 10);   // percentage offset
       const saturation = parseInt(saturationSlider.value, 10) / 100; // 1 = normal
       const blacks     = parseInt(blacksSlider.value, 10);
       const whites     = parseInt(whitesSlider.value, 10);
@@ -214,14 +293,12 @@
         b = contrastFactor * (b - 128) + 128;
 
         // 4. Apply Saturation.
-        // Convert to HSL, adjust S, then back to RGB.
         let {h, s, l} = rgbToHsl(r, g, b);
         s *= saturation;
         if(s > 1) s = 1;
         ({r, g, b} = hslToRgb(h, s, l));
 
         // 5. Adjust Blacks/Whites (levels).
-        // Remap pixel value: new = (old - blacks) * (255 / (whites - blacks))
         r = (r - blacks) * (255 / (whites - blacks));
         g = (g - blacks) * (255 / (whites - blacks));
         b = (b - blacks) * (255 / (whites - blacks));
@@ -234,7 +311,6 @@
         // 6. Convert to grayscale using the luminosity method.
         const gray = 0.299 * r + 0.587 * g + 0.114 * b;
         data[i] = data[i+1] = data[i+2] = gray;
-        // Alpha remains unchanged.
       }
 
       // Optionally apply sharpening if sharpness is greater than 0.
@@ -272,7 +348,6 @@
             }
           }
           const avg = total / count;
-          // Map average brightness (0-255) to an ASCII character.
           const charIndex = Math.floor((avg / 255) * (asciiChars.length - 1));
           asciiStr += asciiChars[charIndex];
         }
@@ -293,7 +368,7 @@
             min = Math.min(r, g, b);
       let h, s, l = (max + min) / 2;
       if (max === min) {
-        h = s = 0; // achromatic
+        h = s = 0;
       } else {
         const d = max - min;
         s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
@@ -311,7 +386,7 @@
     function hslToRgb(h, s, l) {
       let r, g, b;
       if(s === 0) {
-        r = g = b = l * 255; // achromatic
+        r = g = b = l * 255;
       } else {
         const hue2rgb = function(p, q, t) {
           if(t < 0) t += 1;
@@ -331,8 +406,6 @@
     }
 
     // --- Convolution & Blending Functions ---
-
-    // Applies a convolution filter to the given imageData using a 3x3 kernel.
     function applyConvolution(imageData, kernel) {
       const width  = imageData.width;
       const height = imageData.height;
@@ -340,11 +413,9 @@
       const output = ctx.createImageData(width, height);
       const dst    = output.data;
       
-      // Loop over every pixel.
       for (let y = 0; y < height; y++) {
         for (let x = 0; x < width; x++) {
           let sum = 0;
-          // For grayscale images, we only need one channel.
           for (let ky = -1; ky <= 1; ky++) {
             for (let kx = -1; kx <= 1; kx++) {
               const posX = x + kx;
@@ -357,7 +428,6 @@
             }
           }
           const dstIdx = (y * width + x) * 4;
-          // Clamp and set for R, G, and B channels (alpha remains unchanged).
           const v = clamp(sum, 0, 255);
           dst[dstIdx] = dst[dstIdx+1] = dst[dstIdx+2] = v;
           dst[dstIdx+3] = src[dstIdx+3];
@@ -365,8 +435,7 @@
       }
       return output;
     }
-
-    // A standard sharpening kernel.
+    
     function sharpenKernel() {
       return [
          0, -1,  0,
@@ -374,8 +443,7 @@
          0, -1,  0
       ];
     }
-
-    // Blends two images by a given factor (0 = original, 1 = fully blended in).
+    
     function blendImages(base, overlay, factor) {
       const blended = ctx.createImageData(base.width, base.height);
       const bData = base.data;
@@ -389,10 +457,8 @@
       }
       return blended;
     }
-
-    // Implements a simple unsharp mask to boost clarity.
+    
     function unsharpMask(imageData) {
-      // Create a blurred version using a simple box blur kernel.
       const boxKernel = [
         1/9, 1/9, 1/9,
         1/9, 1/9, 1/9,
@@ -405,7 +471,6 @@
       const blurData = blurred.data;
       const output = ctx.createImageData(width, height);
       const dst = output.data;
-      // For each pixel, add the difference between original and blurred.
       for (let i = 0; i < src.length; i += 4) {
         const diff = src[i] - blurData[i];
         const val = clamp(src[i] + diff, 0, 255);
@@ -414,9 +479,8 @@
       }
       return output;
     }
-
+    
     // --- Event Listeners ---
-    // Update the image whenever any slider changes.
     [
       exposureSlider,
       brightnessSlider,
